@@ -21,21 +21,31 @@ interface ActionMeta<Payload, Meta> extends Action<Payload> {
 }
 
 interface ReducerMap<State, Payload> {
-    [actionType: string]: Reducer<State, Payload> | ReducerNextThrow<State, Payload>;
+    [actionType: string]: Reducer<State, Payload> | ReducerNext<State, Payload> | ReducerThrow<State, Payload>;
 }
 
 interface ReducerMapMeta<State, Payload, Meta> {
-    [actionType: string]: Reducer<State, Payload> | ReducerNextThrow<State, Payload>;
+    [actionType: string]: Reducer<State, Payload> | ReducerNextMeta<State, Payload, Meta> | ReducerThrowMeta<State, Payload, Meta>;
 }
 
-interface ReducerNextThrow<State, Payload> {
-    next?(state: State, action: Action<Payload>): State;
+interface ReducerNext<State, Payload> {
+    next(state: State, action: Action<Payload>): State;
     throw?(state: State, action: Action<Payload>): State;
 }
 
-interface ReducerNextThrowMeta<State, Payload, Meta> {
-    next?(state: State, action: ActionMeta<Payload, Meta>): State;
+interface ReducerThrow<State, Payload> {
+    next?(state: State, action: Action<Payload>): State;
+    throw(state: State, action: Action<Payload>): State;
+}
+
+interface ReducerNextMeta<State, Payload, Meta> {
+    next(state: State, action: ActionMeta<Payload, Meta>): State;
     throw?(state: State, action: ActionMeta<Payload, Meta>): State;
+}
+
+interface ReducerThrowMeta<State, Payload, Meta> {
+    next?(state: State, action: ActionMeta<Payload, Meta>): State;
+    throw(state: State, action: ActionMeta<Payload, Meta>): State;
 }
 
 type ActionFunctions<Payload> = ActionFunction0<Action<Payload>> | ActionFunction1<any, Action<Payload>> | ActionFunction2<any, any, Action<Payload>> | ActionFunction3<any, any, any, Action<Payload>> | ActionFunction4<any, any, any, any, Action<Payload>> | ActionFunctionAny<Action<Payload>>;
@@ -89,13 +99,13 @@ export function createAction<Payload, Meta>(
 
 export function handleAction<State, Payload>(
     actionType: string | ActionFunctions<Payload>,
-    reducer: Reducer<State, Payload> | ReducerNextThrow<State, Payload>,
+    reducer: Reducer<State, Payload> | ReducerNext<State, Payload> | ReducerThrow<State, Payload>,
     initialState: State
 ): Reducer<State, Payload>;
 
 export function handleAction<State, Payload, Meta>(
     actionType: { toString(): string },
-    reducer: ReducerMeta<State, Payload, Meta> | ReducerNextThrowMeta<State, Payload, Meta>,
+    reducer: ReducerMeta<State, Payload, Meta> | ReducerNextMeta<State, Payload, Meta> | ReducerThrowMeta<State, Payload, Meta>,
     initialState: State
 ): Reducer<State, Payload>;
 
